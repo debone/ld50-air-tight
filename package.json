@@ -1,0 +1,23 @@
+{
+  "name": "game-template",
+  "version": "1.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/debone/game-template.git",
+  "author": "Victor Debone <victor@debone.com.br>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "pre-release": "bump prerelease --commit \"prerelease v\" --tag \"v\" --push",
+    "release": "bump patch --commit \"release v\" --tag \"v\" --push"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.4",
+    "vite": "^2.9.0"
+  },
+  "dependencies": {
+    "phaser": "3.55.2",
+    "version-bump-prompt": "^6.1.0"
+  }
+}
