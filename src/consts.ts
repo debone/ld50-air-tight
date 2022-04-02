@@ -12,6 +12,12 @@ export const COLORS = [
   "#a9a421", // bright yellow
 ];
 
+export const TILE_WIDTH = 32;
+export const TILE_HEIGHT = 32;
+
+export const TILE_IMAGE_WIDTH = 48;
+export const TILE_IMAGE_HEIGHT = 48;
+
 export const GAME_CONFIG = {
   type: Phaser.AUTO,
   scale: {
@@ -23,7 +29,11 @@ export const GAME_CONFIG = {
   backgroundColor: COLORS[0],
   //"render.transparent": true,
   parent: "game-container",
+  pixelArt: true,
   physics: {
     default: "arcade",
+    arcade: {
+      gravity: { y: 0 },
+    },
   },
 };
