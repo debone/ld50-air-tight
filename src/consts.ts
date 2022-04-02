@@ -30,6 +30,7 @@ export const GAME_CONFIG = {
   //"render.transparent": true,
   parent: "game-container",
   pixelArt: true,
+  roundPixels: true,
   physics: {
     default: "arcade",
     arcade: {

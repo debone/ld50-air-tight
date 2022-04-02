@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { TILE_HEIGHT, TILE_WIDTH } from "../../src/consts";
+import { Player } from "../objects/player";
 import { AirTemperature } from "../systems/airTemperature";
 
 // https://hue.tools/mix?colors=bd3a0aff%3B4984b9ff&steps=16&view=steps&mode=lch
@@ -16,9 +17,17 @@ export class SceneWorld extends Phaser.Scene {
 
   level: number[][];
 
+  player: Player;
+
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+
   preload() {
     this.load.image("tiles", new URL("/src/assets/pixeltile.png", import.meta.url).href);
     this.load.image("temperature", new URL("/src/assets/temperature.png", import.meta.url).href);
+    this.load.spritesheet("player", new URL("/src/assets/player.png", import.meta.url).href, {
+      frameWidth: 48,
+      frameHeight: 48,
+    });
   }
 
   create() {
@@ -55,16 +64,20 @@ export class SceneWorld extends Phaser.Scene {
     const temperature = this.map.addTilesetImage("temperature", undefined, 1, 1);
     this.airLayer = this.map.createBlankLayer("air", temperature, 0, 0);
     this.airLayer.fill(1);
+    this.airLayer.setCollision(0);
+    this.airLayer.alpha = 0.5;
 
     this.marker = this.add.graphics();
     this.marker.lineStyle(2, 0xffffff, 1);
     this.marker.strokeRect(0, 0, this.map.tileWidth, this.map.tileHeight);
 
-    this.time.addEvent({
-      delay: 1000,
-      callback: () => this.airTemperatureTick(),
-      loop: true,
-    });
+    this.player = this.add.existing(new Player(this, 1, 1, "player", 1));
+    this.physics.world.enableBody(this.player);
+
+    //this.cameras.main.setBounds(0, 0, 100, 100);
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+
+    this.cursors = this.input.keyboard.createCursorKeys();
 
     this.airTemp = new AirTemperature(this.map.width, this.map.height);
     this.airTemp.conductivity = 0.7;
@@ -105,6 +118,13 @@ export class SceneWorld extends Phaser.Scene {
     this.airTemp.set(5, 5, 10);
     this.airTemp.set(5, 6, 10);
     this.airTemp.set(5, 7, 10);
+
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => this.airTemperatureTick(),
+      loop: true,
+    });
+    this.airTemperatureTick();
   }
 
   airTemperatureTick() {
@@ -113,17 +133,12 @@ export class SceneWorld extends Phaser.Scene {
 
     this.airLayer.forEachTile((tile) => {
       tile.index = Math.floor(this.airTemp.get(tile.x, tile.y));
-
-      if (tile.properties?.temperature > 0) {
-        /*        const testTile = this.airLayer.putTileAt(tile.x - 1, tile.y);
-        if (testTile) {
-          testTile.index = 
-        }*/
-      }
     });
   }
 
-  update(/*time, delta*/) {
+  update(time: number /*, delta*/) {
+    this.player.update(time);
+
     const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
 
     // Rounds down to nearest tile
@@ -137,10 +152,11 @@ export class SceneWorld extends Phaser.Scene {
     if (this.input.manager.activePointer.isDown) {
       let tile = this.map.getTileAt(pointerTileX, pointerTileY);
       console.log("Tile", tile?.index);
+      console.log("Tile", tile?.collides);
       if (tile && tile.index > 0) {
-        this.airTemp.block(tile.x, tile.y);
-      } else if (tile.index === 0) {
-        this.airTemp.unblock(tile.x, tile.y);
+        // this.airTemp.block(tile.x, tile.y);
+      } else if (tile?.index === 0) {
+        //this.airTemp.unblock(tile.x, tile.y);
       }
     }
   }
