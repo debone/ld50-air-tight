@@ -1,8 +1,8 @@
 {
-  "name": "game-template",
+  "name": "ld50-air-tight",
   "version": "1.0.1",
   "main": "index.js",
-  "repository": "https://github.com/debone/game-template.git",
+  "repository": "https://github.com/debone/ld50-air-tight.git",
   "author": "Victor Debone <victor@debone.com.br>",
   "license": "MIT",
   "scripts": {
@@ -10,14 +10,18 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "pre-release": "bump prerelease --commit \"prerelease v\" --tag \"v\" --push",
-    "release": "bump patch --commit \"release v\" --tag \"v\" --push"
+    "release": "bump patch --commit \"release v\" --tag \"v\" --push",
+    "test": "vitest --environment jsdom"
   },
   "devDependencies": {
     "typescript": "^4.5.4",
-    "vite": "^2.9.0"
+    "vite": "^2.9.0",
+    "@types/jsdom": "^16.2.14",
+    "jsdom": "^19.0.0",
+    "version-bump-prompt": "^6.1.0",
+    "vitest": "^0.8.2"
   },
   "dependencies": {
-    "phaser": "3.55.2",
-    "version-bump-prompt": "^6.1.0"
+    "phaser": "3.55.2"
   }
 }
