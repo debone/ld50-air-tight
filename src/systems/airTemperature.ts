@@ -58,6 +58,21 @@ export class AirTemperature {
     this.airTemperatureDelta[x + y * this.width] += value;
   }
 
+  /**
+   * Do not use, it's probably wrong and it works good enough for the player
+   */
+  setDeltaMax(x: number, y: number, value: number, max: number) {
+    if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
+
+    if (this.unguardedGet(x, y) < max) {
+      if (this.unguardedGet(x, y) + value > max) {
+        this.setDelta(x, y, max - this.unguardedGet(x, y));
+      } else {
+        this.setDelta(x, y, value);
+      }
+    }
+  }
+
   resetDelta() {
     this.airTemperatureDelta = Array(this.width * this.height).fill(0);
   }

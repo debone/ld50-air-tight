@@ -9,17 +9,21 @@ import { AirTemperature } from "../systems/airTemperature";
 // https://labs.phaser.io/assets/tilemaps/tiles/gridtiles.png
 
 export class SceneWorld extends Phaser.Scene {
-  map: Phaser.Tilemaps.Tilemap;
-  marker: Phaser.GameObjects.Graphics;
-  airLayer: Phaser.Tilemaps.TilemapLayer;
+  declare map: Phaser.Tilemaps.Tilemap;
+  declare marker: Phaser.GameObjects.Graphics;
+  declare airLayer: Phaser.Tilemaps.TilemapLayer;
 
-  airTemp: AirTemperature;
+  declare airTemp: AirTemperature;
 
-  level: number[][];
+  declare level: number[][];
 
-  player: Player;
+  declare player: Player;
 
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  declare cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+
+  constructor() {
+    super("world");
+  }
 
   preload() {
     this.load.image("tiles", new URL("/src/assets/pixeltile.png", import.meta.url).href);
@@ -31,6 +35,7 @@ export class SceneWorld extends Phaser.Scene {
   }
 
   create() {
+    this.scene.run("hud");
     // Load a map from a 2D array of tile indices
     this.level = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -132,7 +137,7 @@ export class SceneWorld extends Phaser.Scene {
     this.airTemp.set(5, 6, 10);
 
     this.airLayer.forEachTile((tile) => {
-      tile.index = Math.floor(this.airTemp.get(tile.x, tile.y));
+      tile.index = Math.floor(this.airTemp.unguardedGet(tile.x, tile.y));
     });
   }
 
