@@ -3,16 +3,19 @@ MVP:
         - Make it move slower
         - Change color?
     - Bare-bone intro
-    - Player death (sleep with teleport and reset)
-    - Player sleep
+    - Player death
+    - Ship
+    - one battery type
+    - carrying the battery
+    - win game with 100 battery
     - Clock
     - Building walls
+        - Destryiing walls
     - Intro https://labs.phaser.io/view.html?src=src/scenes/transition%20test%201.js&rnd=0.5830582786380217
     - Ending
 
 Graphics:
     - Character https://labs.phaser.io/edit.html?src=src/animation/aseprite%20animation.js
-    - Floor
     - Intro
     - Better HUD, see https://labs.phaser.io/assets/pics/cockpit.png
     - Walls
@@ -20,8 +23,8 @@ Graphics:
 Should:
     - Font
     - Walkie talkie
-    - Night cycle
     - Background music/sound
+    - more batteries
 
 Nice to have:
     - Lights https://labs.phaser.io/edit.html?src=src/tilemap/light%20map.js
