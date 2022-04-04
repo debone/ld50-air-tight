@@ -6,7 +6,10 @@ export class SceneHUD extends Phaser.Scene {
   preload() {
     this.load.image("hud", new URL("/src/assets/hud.png", import.meta.url).href);
   }
+
   declare temperature: Phaser.GameObjects.Text;
+  declare carrying: Phaser.GameObjects.Text;
+
   create() {
     const hudBackground = this.add.image(0, 0, "hud");
 
@@ -30,15 +33,31 @@ export class SceneHUD extends Phaser.Scene {
         x: 5,
         y: 5,
       },
+      fixedWidth: 100,
+    });
+
+    this.carrying = this.add.text(650, 70, "Nothing", {
+      font: "24px verdana",
+      color: "cyan",
+      backgroundColor: "black",
+      padding: {
+        x: 5,
+        y: 5,
+      },
+      fixedWidth: 150,
     });
 
     this.registry.events.on("changedata", (...args: any) => this.updateData.apply(this, args));
   }
 
   updateData(parent, key, data) {
-    console.log(parent, key, data);
+    //console.log(parent, key, data);
     if (key === "playerTemperature") {
       this.temperature.text = `${data.toFixed(1)} K`;
+    }
+
+    if (key === "playerCarrying") {
+      this.carrying.text = data;
     }
   }
 }

@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { TILE_HEIGHT, TILE_WIDTH } from "../../src/consts";
+import { ObjectsLayer } from "../objects/objectsLayer";
 import { Player } from "../objects/player";
 import { AirTemperature } from "../systems/airTemperature";
 
@@ -11,7 +12,11 @@ import { AirTemperature } from "../systems/airTemperature";
 export class SceneWorld extends Phaser.Scene {
   declare map: Phaser.Tilemaps.Tilemap;
   declare marker: Phaser.GameObjects.Graphics;
+
+  declare groundLayer: Phaser.Tilemaps.TilemapLayer;
   declare airLayer: Phaser.Tilemaps.TilemapLayer;
+
+  declare objectLayer: ObjectsLayer;
 
   declare airTemp: AirTemperature;
 
@@ -26,34 +31,57 @@ export class SceneWorld extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("tiles", new URL("/src/assets/pixeltile.png", import.meta.url).href);
+    this.load.image("tiles", new URL("/src/assets/outside-ground-tileset.png", import.meta.url).href);
     this.load.image("temperature", new URL("/src/assets/temperature.png", import.meta.url).href);
-    this.load.spritesheet("player", new URL("/src/assets/player.png", import.meta.url).href, {
+
+    this.load.spritesheet("objects", new URL("/src/assets/object-tileset.png", import.meta.url).href, {
       frameWidth: 48,
       frameHeight: 48,
     });
+
+    this.load.aseprite(
+      "player",
+      new URL("/src/assets/player.png", import.meta.url).href,
+      new URL("/src/assets/player.json", import.meta.url).href
+    );
   }
 
   create() {
     this.scene.run("hud");
     // Load a map from a 2D array of tile indices
     this.level = [
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ];
 
     // When loading from an array, make sure to specify the tileWidth and tileHeight
@@ -63,32 +91,51 @@ export class SceneWorld extends Phaser.Scene {
       tileHeight: TILE_HEIGHT,
     });
 
-    const tiles = this.map.addTilesetImage("tiles", undefined, 1, 1);
-    const ground = this.map.createLayer(0, tiles, 0, 0);
+    this.airTemp = new AirTemperature(this.map.width, this.map.height);
+    this.airTemp.conductivity = 0.7;
+    this.airTemp.loss = 0.2;
+
+    const tiles = this.map.addTilesetImage("tiles", undefined, 16, 16);
+    this.groundLayer = this.map.createLayer(0, tiles, 0, 0);
+    this.groundLayer.randomize(0, 0, this.map.width, this.map.height, [0, 1, 2, 3, 4, 5]);
+    this.groundLayer.scale = 2;
 
     const temperature = this.map.addTilesetImage("temperature", undefined, 1, 1);
     this.airLayer = this.map.createBlankLayer("air", temperature, 0, 0);
     this.airLayer.fill(1);
-    this.airLayer.setCollision(0);
-    this.airLayer.alpha = 0.5;
+    this.airLayer.alpha = 0;
+    this.airLayer.scale = 2;
+
+    this.player = new Player(this, 0, 0, "player", 1);
+
+    /*
+    const objects = this.map.addTilesetImage("objects", undefined, 48, 48);
+    this.objectLayer = this.map.createBlankLayer("object", objects, -64, -64, undefined, undefined, 48, 48);
+    this.objectLayer.setDepth(3);
+    this.objectLayer.setRenderOrder(0);
+    this.objectLayer.putTileAt(17, 2, 2);
+    this.objectLayer.putTileAt(49, 4, 2);
+    this.objectLayer.putTileAt(49, 5, 2);
+    this.objectLayer.putTileAt(49, 6, 2);
+    this.objectLayer.scale = 2;
+*/
+    this.objectLayer = this.add.existing(new ObjectsLayer(this, this.map, "objects"));
+    this.objectLayer.createObjectAt(1, 2, "battery-1");
+    this.objectLayer.createObjectAt(4, 2, "wall-1");
+    this.objectLayer.createObjectAt(5, 2, "wall-1");
+
+    this.objectLayer.add(this.player);
+
+    //  this.map.setLayer(this.airLayer);
 
     this.marker = this.add.graphics();
     this.marker.lineStyle(2, 0xffffff, 1);
-    this.marker.strokeRect(0, 0, this.map.tileWidth, this.map.tileHeight);
-
-    this.player = this.add.existing(new Player(this, 1, 1, "player", 1));
-    this.physics.world.enableBody(this.player);
+    this.marker.strokeRect(0, 0, this.map.tileWidth * 2, this.map.tileHeight * 2);
 
     //this.cameras.main.setBounds(0, 0, 100, 100);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
     this.cursors = this.input.keyboard.createCursorKeys();
-
-    this.airTemp = new AirTemperature(this.map.width, this.map.height);
-    this.airTemp.conductivity = 0.7;
-    // inside?
-    //this.airTemp.loss = 0.2;
-    this.airTemp.loss = 0.2;
 
     this.airTemp.block(15, 4);
     this.airTemp.block(13, 4);

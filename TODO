@@ -2,29 +2,32 @@ MVP:
     ✔ Player temperature @done(22-04-02 23:53)
         - Make it move slower
         - Change color?
+    - Player carrying stuff
+        - For now, change the tint.
+    - Ship
     - Bare-bone intro
     - Player death
-    - Ship
     - one battery type
     - carrying the battery
-    - win game with 100 battery
+    - win game with 100% battery
     - Clock
-    - Building walls
+    - Building walls (only on the world scene)
         - Destryiing walls
     - Intro https://labs.phaser.io/view.html?src=src/scenes/transition%20test%201.js&rnd=0.5830582786380217
     - Ending
 
 Graphics:
-    - Character https://labs.phaser.io/edit.html?src=src/animation/aseprite%20animation.js
+    ✔ Character https://labs.phaser.io/edit.html?src=src/animation/aseprite%20animation.js @done(22-04-04 02:02)
     - Intro
     - Better HUD, see https://labs.phaser.io/assets/pics/cockpit.png
-    - Walls
+    ✔ Walls @done(22-04-04 02:03)
+    - solar panels
+    - ship
+        - ship wall
+    ✔ world @done(22-04-04 02:03)
 
 Should:
     - Font
     - Walkie talkie
     - Background music/sound
     - more batteries
-
-Nice to have:
-    - Lights https://labs.phaser.io/edit.html?src=src/tilemap/light%20map.js

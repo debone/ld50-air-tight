@@ -12,8 +12,8 @@ export const COLORS = [
   "#a9a421", // bright yellow
 ];
 
-export const TILE_WIDTH = 32;
-export const TILE_HEIGHT = 32;
+export const TILE_WIDTH = 16;
+export const TILE_HEIGHT = 16;
 
 export const TILE_IMAGE_WIDTH = 48;
 export const TILE_IMAGE_HEIGHT = 48;
