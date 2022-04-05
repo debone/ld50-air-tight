@@ -32,18 +32,18 @@ export class SceneWorld extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("tiles", new URL("/src/assets/outside-ground-tileset.png", import.meta.url).href);
-    this.load.image("temperature", new URL("/src/assets/temperature.png", import.meta.url).href);
+    this.load.image("tiles", new URL("../assets/outside-ground-tileset.png", import.meta.url).href);
+    this.load.image("temperature", new URL("../assets/temperature.png", import.meta.url).href);
 
-    this.load.spritesheet("objects", new URL("/src/assets/object-tileset.png", import.meta.url).href, {
+    this.load.spritesheet("objects", new URL("../assets/object-tileset.png", import.meta.url).href, {
       frameWidth: 48,
       frameHeight: 48,
     });
 
     this.load.aseprite(
       "player",
-      new URL("/src/assets/player.png", import.meta.url).href,
-      new URL("/src/assets/player.json", import.meta.url).href
+      new URL("../assets/player.png", import.meta.url).href,
+      new URL("../assets/player.json", import.meta.url).href
     );
   }
 

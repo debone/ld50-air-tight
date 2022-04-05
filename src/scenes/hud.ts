@@ -8,7 +8,7 @@ export class SceneHUD extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet("hud", new URL("/src/assets/hud.png", import.meta.url).href, {
+    this.load.spritesheet("hud", new URL("../assets/hud.png", import.meta.url).href, {
       frameWidth: 800,
       frameHeight: 600,
     });
