@@ -1,10 +1,13 @@
 import Phaser from "phaser";
-import tilesImg from "../assets/outside-ground-tileset.png";
-import temperatureImg from "../assets/temperature.png";
-import objectTileset from "../assets/object-tileset.png";
-import hudImg from "../assets/hud.png";
-import playerImg from "../assets/player.png";
-import playerImgJson from "../assets/player.json";
+
+import tilesImg from "../assets/outside-ground-tileset.png?url";
+import temperatureImg from "../assets/temperature.png?url";
+import objectTileset from "../assets/object-tileset.png?url";
+import hudImg from "../assets/hud.png?url";
+import playerImg from "../assets/player.png?url";
+
+import playerImgJson from "../assets/player.json?url";
+
 declare var WebFont: any;
 
 export class SceneMain extends Phaser.Scene {
