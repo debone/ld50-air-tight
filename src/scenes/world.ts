@@ -4,12 +4,7 @@ import { ObjectsLayer } from "../objects/objectsLayer";
 import { Player } from "../objects/player";
 import { AirTemperature } from "../systems/airTemperature";
 
-import tilesImg from "../assets/outside-ground-tileset.png";
-import temperatureImg from "../assets/temperature.png";
-import objectTileset from "../assets/object-tileset.png";
 
-import playerImg from "../assets/player.png";
-import playerImgJson from "../assets/player.json";
 
 // https://hue.tools/mix?colors=bd3a0aff%3B4984b9ff&steps=16&view=steps&mode=lch
 
@@ -37,19 +32,7 @@ export class SceneWorld extends Phaser.Scene {
   constructor() {
     super("world");
   }
-
-  preload() {
-    this.load.image("tiles", tilesImg);
-    this.load.image("temperature", temperatureImg);
-
-    this.load.spritesheet("objects", objectTileset, {
-      frameWidth: 48,
-      frameHeight: 48,
-    });
-
-    this.load.aseprite("player", playerImg, playerImgJson);
-  }
-
+  
   create() {
     this.scene.run("hud", { sceneWorld: this });
     this.scene.run("comms", { sceneWorld: this });

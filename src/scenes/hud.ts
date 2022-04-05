@@ -1,19 +1,12 @@
 import { SceneWorld } from "./world";
 
-import hudImg from "../assets/hud.png";
+
 
 export class SceneHUD extends Phaser.Scene {
   declare sceneWorld: SceneWorld;
 
   constructor() {
     super("hud");
-  }
-
-  preload() {
-    this.load.spritesheet("hud", hudImg, {
-      frameWidth: 800,
-      frameHeight: 600,
-    });
   }
 
   declare temperature: Phaser.GameObjects.Text;

@@ -1,5 +1,10 @@
 import Phaser from "phaser";
-
+import tilesImg from "../assets/outside-ground-tileset.png";
+import temperatureImg from "../assets/temperature.png";
+import objectTileset from "../assets/object-tileset.png";
+import hudImg from "../assets/hud.png";
+import playerImg from "../assets/player.png";
+import playerImgJson from "../assets/player.json";
 declare var WebFont: any;
 
 export class SceneMain extends Phaser.Scene {
@@ -10,6 +15,20 @@ export class SceneMain extends Phaser.Scene {
   }
 
   preload() {
+    this.load.spritesheet("hud", hudImg, {
+      frameWidth: 800,
+      frameHeight: 600,
+    });
+
+    this.load.image("tiles", tilesImg);
+    this.load.image("temperature", temperatureImg);
+
+    this.load.spritesheet("objects", objectTileset, {
+      frameWidth: 48,
+      frameHeight: 48,
+    });
+
+    this.load.aseprite("player", playerImg, playerImgJson);
     this.load.script("webfont", "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js");
   }
 
