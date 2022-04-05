@@ -1,5 +1,7 @@
 import { SceneWorld } from "./world";
 
+import hudImg from "../assets/hud.png";
+
 export class SceneHUD extends Phaser.Scene {
   declare sceneWorld: SceneWorld;
 
@@ -8,7 +10,7 @@ export class SceneHUD extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet("hud", new URL("../assets/hud.png", import.meta.url).href, {
+    this.load.spritesheet("hud", hudImg, {
       frameWidth: 800,
       frameHeight: 600,
     });

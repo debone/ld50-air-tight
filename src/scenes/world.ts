@@ -4,6 +4,13 @@ import { ObjectsLayer } from "../objects/objectsLayer";
 import { Player } from "../objects/player";
 import { AirTemperature } from "../systems/airTemperature";
 
+import tilesImg from "../assets/outside-ground-tileset.png";
+import temperatureImg from "../assets/temperature.png";
+import objectTileset from "../assets/object-tileset.png";
+
+import playerImg from "../assets/player.png";
+import playerImgJson from "../assets/player.json";
+
 // https://hue.tools/mix?colors=bd3a0aff%3B4984b9ff&steps=16&view=steps&mode=lch
 
 // floor inspiration
@@ -32,19 +39,15 @@ export class SceneWorld extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("tiles", new URL("../assets/outside-ground-tileset.png", import.meta.url).href);
-    this.load.image("temperature", new URL("../assets/temperature.png", import.meta.url).href);
+    this.load.image("tiles", tilesImg);
+    this.load.image("temperature", temperatureImg);
 
-    this.load.spritesheet("objects", new URL("../assets/object-tileset.png", import.meta.url).href, {
+    this.load.spritesheet("objects", objectTileset, {
       frameWidth: 48,
       frameHeight: 48,
     });
 
-    this.load.aseprite(
-      "player",
-      new URL("../assets/player.png", import.meta.url).href,
-      new URL("../assets/player.json", import.meta.url).href
-    );
+    this.load.aseprite("player", playerImg, playerImgJson);
   }
 
   create() {
