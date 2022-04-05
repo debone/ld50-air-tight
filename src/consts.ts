@@ -26,7 +26,7 @@ export const GAME_CONFIG = {
   },
   width: 800,
   height: 600,
-  backgroundColor: COLORS[0],
+  backgroundColor: '#394778',
   //"render.transparent": true,
   parent: "game-container",
   pixelArt: true,

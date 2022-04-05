@@ -2,32 +2,32 @@ MVP:
     ✔ Player temperature @done(22-04-02 23:53)
         - Make it move slower
         - Change color?
-    - Player carrying stuff
-        - For now, change the tint.
-    - Ship
-    - Bare-bone intro
+    ✔ Player carrying stuff @done(22-04-04 19:35)
+    - Walkie talkie
+        - Bare-bone intro
+        - Player death
+        - win game with 100% battery
     - Player death
-    - one battery type
-    - carrying the battery
+    - charger for battery
+    - adding charged battery to ship
     - win game with 100% battery
-    - Clock
-    - Building walls (only on the world scene)
-        - Destryiing walls
+    - enough walls to build some shelter 
     - Intro https://labs.phaser.io/view.html?src=src/scenes/transition%20test%201.js&rnd=0.5830582786380217
     - Ending
-
-Graphics:
-    ✔ Character https://labs.phaser.io/edit.html?src=src/animation/aseprite%20animation.js @done(22-04-04 02:02)
-    - Intro
-    - Better HUD, see https://labs.phaser.io/assets/pics/cockpit.png
-    ✔ Walls @done(22-04-04 02:03)
-    - solar panels
-    - ship
-        - ship wall
-    ✔ world @done(22-04-04 02:03)
-
-Should:
     - Font
-    - Walkie talkie
     - Background music/sound
-    - more batteries
+    ✔ Character https://labs.phaser.io/edit.html?src=src/animation/aseprite%20animation.js @done(22-04-04 02:02)
+    ✔ graphics @done(22-04-04 16:22)
+        ✔ Better HUD, see https://labs.phaser.io/assets/pics/cockpit.png @done(22-04-04 16:21)
+            ✔ heat filter slider @done(22-04-04 16:21)
+            ✔ two temperatures @done(22-04-04 16:21)
+        ✔ Walls @done(22-04-04 02:03)
+        ✔ solar panels @done(22-04-04 14:58)
+            ✔ dirty solar panels @done(22-04-04 14:58)
+        ✔ battery levels @done(22-04-04 14:58)
+            ✔ battery charging @done(22-04-04 14:58)
+        ✔ ship @done(22-04-04 14:58)
+            ✔ empty slot @done(22-04-04 14:58)
+            ✔ batteries on slot @done(22-04-04 14:58)
+        ✔ world @done(22-04-04 02:03)
+    

@@ -1,4 +1,7 @@
+import { assert } from "../lib/assert";
 import { SceneWorld } from "../scenes/world";
+import { Battery } from "./battery";
+import { Wall } from "./wall";
 
 enum Directions {
   UP = 0,
@@ -6,6 +9,13 @@ enum Directions {
   DOWN = 2,
   LEFT = 3,
 }
+
+const inFrontOf = {
+  [Directions.UP]: { x: 0, y: -1 },
+  [Directions.DOWN]: { x: 0, y: 1 },
+  [Directions.LEFT]: { x: -1, y: 0 },
+  [Directions.RIGHT]: { x: 1, y: 0 },
+};
 
 enum Status {
   NORMAL = 0,
@@ -42,7 +52,6 @@ const playerAnimKeys = {
 };
 
 export class Player extends Phaser.GameObjects.Sprite {
-  declare body: Phaser.Physics.Arcade.Body;
   declare scene: SceneWorld;
 
   declare keyW: Phaser.Input.Keyboard.Key;
@@ -53,16 +62,24 @@ export class Player extends Phaser.GameObjects.Sprite {
   declare keySpace: Phaser.Input.Keyboard.Key;
   declare keyShift: Phaser.Input.Keyboard.Key;
 
+  declare playerPos: Phaser.Math.Vector2;
+
   lastMoveTime = 0;
   lastCarryTime = 0;
   lastTemperatureTime = 0;
 
-  playerPos = new Phaser.Math.Vector2(0, 0);
+  dead = false;
+
+  playerLife = 3;
+  temperatureRoundsDamage = 10;
+  currentTemperatureDamageRound = 0;
+
   playerTemperature = 7;
 
   direction = Directions.DOWN;
   playerStatus = Status.NORMAL;
 
+  declare carryingObject: Wall | Battery | undefined;
   carrying = "";
 
   constructor(
@@ -72,7 +89,9 @@ export class Player extends Phaser.GameObjects.Sprite {
     texture: string | Phaser.Textures.Texture,
     frame?: string | number | undefined
   ) {
-    super(scene, x, y, texture, frame);
+    super(scene, x * 16, y * 16, texture, frame);
+
+    this.playerPos = new Phaser.Math.Vector2(x, y);
 
     /*
 
@@ -102,8 +121,9 @@ export class Player extends Phaser.GameObjects.Sprite {
     });
     */
 
-    const tags = this.scene.anims.createFromAseprite("player");
-    console.log(tags);
+    this.scene.anims.createFromAseprite("player");
+
+    this.scene.registry.set("playerLife", this.playerLife);
 
     this.keyW = this.scene.input.keyboard.addKey("W");
     this.keyA = this.scene.input.keyboard.addKey("A");
@@ -124,9 +144,11 @@ export class Player extends Phaser.GameObjects.Sprite {
   }
 
   update(time: number) {
-    this.updatePlayerMovement(time);
-    this.updateTemperature(time);
-    this.updateCarrying(time);
+    if (!this.dead) {
+      this.updatePlayerMovement(time);
+      this.updateTemperature(time);
+      this.updateCarrying(time);
+    }
   }
 
   updateCarrying(time: number) {
@@ -134,9 +156,40 @@ export class Player extends Phaser.GameObjects.Sprite {
 
     if (time > this.lastCarryTime + repeatMoveDelay) {
       if (this.keySpace.isDown) {
-        this.carrying = this.carrying === "" ? "something" : "";
-        this.scene.registry.set("playerCarrying", this.carrying);
-        this.lastCarryTime = time;
+        let objectInFront = this.scene.objectLayer.getObjectAt(
+          inFrontOf[this.direction].x + this.playerPos.x,
+          inFrontOf[this.direction].y + this.playerPos.y
+        );
+        if (
+          this.carryingObject === undefined &&
+          objectInFront !== 0 &&
+          objectInFront !== undefined &&
+          objectInFront.canBePicked
+        ) {
+          let carryingObject = this.scene.objectLayer.takeObjectFrom(
+            inFrontOf[this.direction].x + this.playerPos.x,
+            inFrontOf[this.direction].y + this.playerPos.y
+          );
+          assert(carryingObject !== 0 && carryingObject !== undefined, "broke js");
+          this.carryingObject = carryingObject;
+          this.carrying = "something";
+          this.scene.registry.set("playerCarrying", this.carrying);
+          this.lastCarryTime = time;
+        } else if (
+          this.carryingObject !== undefined &&
+          objectInFront === 0 &&
+          objectInFront !== undefined &&
+          this.scene.objectLayer.putObjectAt(
+            inFrontOf[this.direction].x + this.playerPos.x,
+            inFrontOf[this.direction].y + this.playerPos.y,
+            this.carryingObject
+          )
+        ) {
+          this.carryingObject = undefined;
+          this.carrying = "";
+          this.scene.registry.set("playerCarrying", this.carrying);
+          this.lastCarryTime = time;
+        }
       }
     }
   }
@@ -151,14 +204,84 @@ export class Player extends Phaser.GameObjects.Sprite {
         this.playerTemperature += Math.min(0.5, Math.abs(this.playerTemperature - playerAreaTemperature));
       }
 
+      if (this.playerTemperature > 10 || this.playerTemperature < 3) {
+        this.currentTemperatureDamageRound++;
+        if (this.currentTemperatureDamageRound >= this.temperatureRoundsDamage) {
+          this.currentTemperatureDamageRound = 0;
+          this.playerLife -= 1;
+          this.scene.registry.set("playerLife", this.playerLife);
+          if (this.playerTemperature > 10) {
+            this.scene.cameras.main.flash(1000, 230, 72, 46);
+          } else if (this.playerTemperature < 3) {
+            this.scene.cameras.main.flash(1000, 138, 235, 241);
+          }
+
+          if (this.playerLife === 0) {
+            this.playerDie();
+          }
+        }
+      }
+
       this.scene.airTemp.setDeltaMax(this.playerPos.x, this.playerPos.y, 1, this.playerTemperature);
       this.scene.registry.set("playerTemperature", this.playerTemperature);
       this.lastTemperatureTime = time;
     }
   }
 
+  playerDie() {
+    if (
+      this.carryingObject !== undefined &&
+      this.scene.objectLayer.putObjectAt(this.playerPos.x, this.playerPos.y, this.carryingObject)
+    ) {
+      this.carryingObject = undefined;
+      this.carrying = "";
+      this.scene.registry.set("playerCarrying", this.carrying);
+    }
+
+    this.scene.cameras.main.fadeOut(1500, 255, 255, 255);
+
+    this.dead = true;
+
+    this.scene.time.delayedCall(5500, () => {
+      this.playerPos.x = 20;
+      this.playerPos.y = 10;
+
+      this.lastMoveTime = 0;
+      this.lastCarryTime = 0;
+      this.lastTemperatureTime = 0;
+
+      this.dead = false;
+      this.playerLife = 3;
+      this.scene.registry.set("playerLife", this.playerLife);
+      this.temperatureRoundsDamage = 10;
+      this.currentTemperatureDamageRound = 0;
+
+      this.playerTemperature = 7;
+
+      this.direction = Directions.DOWN;
+      this.playerStatus = Status.NORMAL;
+    });
+
+    this.scene.time.delayedCall(6000, () => {
+      this.scene.cameras.main.fadeIn(500, 0, 0, 0);
+    });
+
+    if (this.playerTemperature > 7) {
+      this.scene.scene
+        .get("comms")
+        .events.emit("messages", [
+          "I hope it didn't hurt much",
+          "You need to avoid getting yourself boiled",
+        ]);
+    } else {
+      this.scene.scene
+        .get("comms")
+        .events.emit("messages", ["Captain, you froze to death", "Maybe your heat vision is turned off?"]);
+    }
+  }
+
   isTileOpenAt(worldX: number, worldY: number) {
-    const tile = this.scene.map.getTileAt(worldX, worldY, true);
+    const tile = this.scene.map.getTileAt(worldX, worldY, true, "interactive");
     //console.log(tile);
     return tile && tile.index > 0;
   }
@@ -167,6 +290,11 @@ export class Player extends Phaser.GameObjects.Sprite {
     if (this.isTileOpenAt(nextX, nextY)) {
       //this.x = this.scene.map.tileToWorldX(this.playerPos.x);
       //this.y = this.scene.map.tileToWorldY(this.playerPos.y);
+
+      if (this.carryingObject) {
+        this.carryingObject.objectPos.x = nextX;
+        this.carryingObject.objectPos.y = nextY;
+      }
 
       this.playerPos.x = nextX;
       this.playerPos.y = nextY;
@@ -218,6 +346,12 @@ export class Player extends Phaser.GameObjects.Sprite {
 
     if (Math.abs(goalPosY - this.y) > 0.01) {
       this.y += (goalPosY - this.y) * 0.2;
+    }
+
+    if (this.carryingObject) {
+      this.carryingObject.x = this.x - 32;
+      this.carryingObject.y = this.y - 32;
+      this.carryingObject.setDepth(this.playerPos.x + this.playerPos.y * this.scene.map.width + 1);
     }
 
     this.setDepth(this.playerPos.x + this.playerPos.y * this.scene.map.width);

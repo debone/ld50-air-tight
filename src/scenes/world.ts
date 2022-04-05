@@ -14,6 +14,7 @@ export class SceneWorld extends Phaser.Scene {
   declare marker: Phaser.GameObjects.Graphics;
 
   declare groundLayer: Phaser.Tilemaps.TilemapLayer;
+  declare interactiveLayer: Phaser.Tilemaps.TilemapLayer;
   declare airLayer: Phaser.Tilemaps.TilemapLayer;
 
   declare objectLayer: ObjectsLayer;
@@ -47,7 +48,9 @@ export class SceneWorld extends Phaser.Scene {
   }
 
   create() {
-    this.scene.run("hud");
+    this.scene.run("hud", { sceneWorld: this });
+    this.scene.run("comms", { sceneWorld: this });
+
     // Load a map from a 2D array of tile indices
     this.level = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -92,7 +95,7 @@ export class SceneWorld extends Phaser.Scene {
     });
 
     this.airTemp = new AirTemperature(this.map.width, this.map.height);
-    this.airTemp.conductivity = 0.7;
+    this.airTemp.conductivity = 0.8;
     this.airTemp.loss = 0.2;
 
     const tiles = this.map.addTilesetImage("tiles", undefined, 16, 16);
@@ -101,12 +104,73 @@ export class SceneWorld extends Phaser.Scene {
     this.groundLayer.scale = 2;
 
     const temperature = this.map.addTilesetImage("temperature", undefined, 1, 1);
+
+    this.interactiveLayer = this.map.createBlankLayer("interactive", temperature, 0, 0);
+    this.interactiveLayer.fill(1);
+    this.interactiveLayer.alpha = 0;
+
+    /* closed batteries */
+    // 49, 50, 51, 52
+    // open
+    // 56, 57, 58, 59
+    this.groundLayer.putTilesAt(
+      [
+        [16, 17, 18, 19, 20, 21, 22],
+        [32, 33, 34, 35, 36, 37, 38],
+        [48, 56, 57, 58, 59, 53, 54],
+        [64, 65, 66, 67, 68, 69, 70],
+      ],
+      13,
+      8
+    );
+
+    this.interactiveLayer.putTilesAt(
+      [
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+      ],
+      13,
+      8
+    );
+
+    this.groundLayer.putTilesAt(
+      [
+        [80, 81, 82, 83],
+        [96, 97, 98, 99],
+        [112, 113, 114, 115],
+      ],
+      5,
+      20
+    );
+
+    this.groundLayer.putTilesAt(
+      [
+        [84, 85],
+        [100, 101],
+        [116, 117],
+      ],
+      13,
+      20
+    );
+
+    this.interactiveLayer.putTilesAt(
+      [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+      ],
+      5,
+      20
+    );
+
     this.airLayer = this.map.createBlankLayer("air", temperature, 0, 0);
     this.airLayer.fill(1);
-    this.airLayer.alpha = 0;
+    this.airLayer.alpha = 0.33;
     this.airLayer.scale = 2;
 
-    this.player = new Player(this, 0, 0, "player", 1);
+    this.player = new Player(this, 20, 10, "player", 1);
+    this.registry.set("playerGoal", 0);
 
     /*
     const objects = this.map.addTilesetImage("objects", undefined, 48, 48);
@@ -120,9 +184,41 @@ export class SceneWorld extends Phaser.Scene {
     this.objectLayer.scale = 2;
 */
     this.objectLayer = this.add.existing(new ObjectsLayer(this, this.map, "objects"));
-    this.objectLayer.createObjectAt(1, 2, "battery-1");
-    this.objectLayer.createObjectAt(4, 2, "wall-1");
-    this.objectLayer.createObjectAt(5, 2, "wall-1");
+    this.objectLayer.createNewObjectAt(5, 26, "battery");
+    this.objectLayer.createNewObjectAt(6, 12, "battery");
+    this.objectLayer.createNewObjectAt(18, 14, "battery");
+    this.objectLayer.createNewObjectAt(21, 23, "battery");
+    //
+
+    this.objectLayer.createNewObjectAt(15, 15, "wall");
+    this.objectLayer.createNewObjectAt(23, 20, "wall");
+    this.objectLayer.createNewObjectAt(23, 22, "wall");
+    this.objectLayer.createNewObjectAt(24, 25, "wall");
+    this.objectLayer.createNewObjectAt(24, 26, "wall");
+
+    this.objectLayer.createNewObjectAt(11, 19, "wall");
+    this.objectLayer.createNewObjectAt(11, 20, "wall");
+    this.objectLayer.createNewObjectAt(11, 21, "wall");
+    this.objectLayer.createNewObjectAt(11, 22, "wall");
+    this.objectLayer.createNewObjectAt(11, 23, "wall");
+
+    this.objectLayer.createNewObjectAt(12, 19, "wall");
+    this.objectLayer.createNewObjectAt(13, 19, "wall");
+    this.objectLayer.createNewObjectAt(14, 19, "wall");
+    this.objectLayer.createNewObjectAt(16, 19, "wall");
+
+    this.objectLayer.createNewObjectAt(17, 22, "wall");
+    this.objectLayer.createNewObjectAt(17, 23, "wall");
+    this.objectLayer.createNewObjectAt(17, 24, "wall");
+
+    this.objectLayer.createNewObjectAt(11, 24, "wall");
+    this.objectLayer.createNewObjectAt(12, 24, "wall");
+    this.objectLayer.createNewObjectAt(13, 24, "wall");
+    this.objectLayer.createNewObjectAt(14, 24, "wall");
+    this.objectLayer.createNewObjectAt(15, 24, "wall");
+    this.objectLayer.createNewObjectAt(16, 24, "wall");
+
+    this.objectLayer.createNewObjectAt(5, 2, "wall");
 
     this.objectLayer.add(this.player);
 
@@ -134,10 +230,11 @@ export class SceneWorld extends Phaser.Scene {
 
     //this.cameras.main.setBounds(0, 0, 100, 100);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    this.cameras.main.fadeFrom(4000, 57, 71, 120);
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.airTemp.block(15, 4);
+    /*this.airTemp.block(15, 4);
     this.airTemp.block(13, 4);
     this.airTemp.block(12, 4);
     this.airTemp.block(11, 4);
@@ -169,7 +266,7 @@ export class SceneWorld extends Phaser.Scene {
 
     this.airTemp.set(5, 5, 10);
     this.airTemp.set(5, 6, 10);
-    this.airTemp.set(5, 7, 10);
+    this.airTemp.set(5, 7, 10);*/
 
     this.time.addEvent({
       delay: 1000,
@@ -181,7 +278,9 @@ export class SceneWorld extends Phaser.Scene {
 
   airTemperatureTick() {
     this.airTemp.tick();
-    this.airTemp.set(5, 6, 10);
+
+    this.airTemp.set(16, 9, 9);
+    this.airTemp.set(17, 9, 9);
 
     this.airLayer.forEachTile((tile) => {
       tile.index = Math.floor(this.airTemp.unguardedGet(tile.x, tile.y));

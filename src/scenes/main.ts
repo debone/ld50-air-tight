@@ -1,18 +1,60 @@
 import Phaser from "phaser";
 
+declare var WebFont: any;
+
 export class SceneMain extends Phaser.Scene {
+  declare keySpace: Phaser.Input.Keyboard.Key;
+
   constructor() {
     super({ key: "SceneMain" });
   }
 
-  preload() {}
-
-  create() {
-    this.add.text(100, 100, "Main", {
-      font: "15vw verdana",
-      color: "white",
-    });
+  preload() {
+    this.load.script("webfont", "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js");
   }
 
-  update(/*time, delta*/) {}
+  create() {
+    this.registry.set("restart", 0);
+
+    WebFont.load({
+      google: {
+        families: ["Bebas Neue", "Fjalla One"],
+      },
+      active: () => {
+        this.add
+          .text(400, 200, "HOT POINT", {
+            fontFamily: "Bebas Neue",
+            fontSize: "100px",
+            color: "#ffffff",
+          })
+          .setShadow(2, 2, "#333333", 2, false, true);
+        this.add
+          .text(200, 300, "Press space to start", {
+            fontFamily: "Bebas Neue",
+            fontSize: "32px",
+            color: "#ffffff",
+          })
+          .setShadow(2, 2, "#333333", 2, false, true);
+        this.add
+          .text(250, 500, "CW: Flashing lights", {
+            fontFamily: "Bebas Neue",
+            fontSize: "48px",
+            color: "#ff0000",
+          })
+          .setShadow(2, 2, "#333333", 2, false, true);
+      },
+    });
+
+    this.keySpace = this.input.keyboard.addKey("SPACE");
+  }
+
+  update(/*time, delta*/) {
+    if (Phaser.Input.Keyboard.JustDown(this.keySpace)) {
+      this.scene.transition({
+        target: "world",
+        duration: 2000,
+        moveBelow: true,
+      });
+    }
+  }
 }

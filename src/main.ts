@@ -9,6 +9,7 @@ import { GAME_CONFIG } from "./consts";
 import { SceneHUD } from "./scenes/hud";
 
 import PhaserGamebus from "./gamebus";
+import { SceneComms } from "./scenes/comms";
 
 const config = {
   ...GAME_CONFIG,
@@ -22,7 +23,7 @@ const config = {
       },
     ],
   },
-  scene: [SceneWorld, SceneHUD],
+  scene: [SceneMain, SceneWorld, SceneHUD, SceneComms],
 };
 
 new Phaser.Game(config);
