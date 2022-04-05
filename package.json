@@ -1,6 +1,6 @@
 {
   "name": "ld50-air-tight",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "repository": "https://github.com/debone/ld50-air-tight.git",
   "author": "Victor Debone <victor@debone.com.br>",
