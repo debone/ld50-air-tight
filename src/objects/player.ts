@@ -170,7 +170,7 @@ export class Player extends Phaser.GameObjects.Sprite {
             inFrontOf[this.direction].x + this.playerPos.x,
             inFrontOf[this.direction].y + this.playerPos.y
           );
-          assert(carryingObject !== 0 && carryingObject !== undefined, "broke js");
+          assert(carryingObject !== undefined, "broke js");
           this.carryingObject = carryingObject;
           this.carrying = "something";
           this.scene.registry.set("playerCarrying", this.carrying);

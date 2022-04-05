@@ -99,12 +99,14 @@ export class AirTemperature {
     if (x < 0 || y < 0 || x >= this.width || y >= this.height) return undefined;
 
     this.airTemperature[x + y * this.width] = this.minTemperature;
+    return true;
   }
 
   block(x: number, y: number) {
     if (x < 0 || y < 0 || x >= this.width || y >= this.height) return undefined;
 
     this.airTemperature[x + y * this.width] = this.wall;
+    return true;
   }
 
   calculateDisperse(x: number, y: number) {
